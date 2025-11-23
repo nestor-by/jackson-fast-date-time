@@ -3,7 +3,6 @@ package com.fasterxml.jackson.example;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -22,8 +21,7 @@ public class LocalDateJsonDeserializer extends JsonDeserializer<LocalDate> {
 
   @Override
   public LocalDate deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-    JsonNode node = jp.readValueAsTree();
-    return dateFromString(node.textValue());
+    return dateFromString(jp.getValueAsString());
   }
 
   private LocalDate dateFromString(String str) {
