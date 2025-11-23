@@ -50,13 +50,13 @@ public class DateDeserializationBenchmark {
   }
 
   @Benchmark
-  public List<DateItem> test2_custom_LocalDate() throws IOException {
+  public List<DateItem> test1_custom_LocalDate() throws IOException {
     return customMapper.readValue(json, new TypeReference<>() {
     });
   }
 
   @Benchmark
-  public List<DateTimeItem> test1_default_LocalDateTime() throws IOException {
+  public List<DateTimeItem> test2_default_LocalDateTime() throws IOException {
     return defaultMapper.readValue(json, new TypeReference<>() {
     });
   }
