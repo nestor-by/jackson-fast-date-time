@@ -1,34 +1,54 @@
-## Benchmark results (JMH)
+# LocalDateTime Deserialization Benchmark (Short Version)
 
-Three implementations were tested:
+## Summary Comparison
 
-1. **default** — standard Jackson `LocalDateTimeDeserializer`
-2. **custom** — earlier custom implementation using Strings (`substring`, `Integer.parseInt`, etc.)
-3. **zeroAlloc** — the new `LocalDateTimeZeroAllocDeserializer` using direct char[] parsing
+| Variant      | Time (ms/op) | Bytes per Operation | GC Count | GC Time (ms) |
+|--------------|--------------|----------------------|----------|--------------|
+| default      | ~2.765       | ~1,294,166 B         | 54       | 260          |
+| custom       | ~1.699       | ~370,050 B           | 24       | 333          |
+| zeroAlloc    | ~0.623       | ~90,936 B            | 29       | 101          |
 
-### Raw results
+**zeroAlloc** is the fastest and allocates the least memory  
+(≈4.5× faster than default, ≈3× faster than custom, ≈14× fewer allocations than default).
+
+---
+
+## Raw Benchmark Results
+
+### default
 
 ```
-Benchmark                                                                    Mode  Cnt   Score     Error   Units
-DateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime                     avgt   10   0.161 ±   0.075   ms/op
-DateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.alloc.rate       avgt   10 572.557 ± 190.794  MB/sec
-DateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.alloc.rate.norm  avgt   10 90803.207 ±  34.693 B/op
-DateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.count            avgt   10    77.000          counts
-DateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.time             avgt   10    44.000          ms
-
-DateDeserializationBenchmark.test2_custom_LocalDateTime                      avgt   10   0.244 ±   0.063   ms/op
-DateDeserializationBenchmark.test2_custom_LocalDateTime:gc.alloc.rate        avgt   10 1476.749 ± 292.338 MB/sec
-DateDeserializationBenchmark.test2_custom_LocalDateTime:gc.alloc.rate.norm   avgt   10 369652.338 ± 28.247 B/op
-
-DateDeserializationBenchmark.test2_default_LocalDateTime                     avgt   10   0.508 ±   0.037   ms/op
-DateDeserializationBenchmark.test2_default_LocalDateTime:gc.alloc.rate       avgt   10 2432.938 ± 157.016 MB/sec
-DateDeserializationBenchmark.test2_default_LocalDateTime:gc.alloc.rate.norm  avgt   10 1293266.575 ± 19.157 B/op
+LocalDateDeserializationBenchmark.test2_default_LocalDateTime                       avgt   10        2.765 ± 2.251   ms/op
+LocalDateDeserializationBenchmark.test2_default_LocalDateTime:gc.alloc.rate         avgt   10      625.679 ± 598.009 MB/sec
+LocalDateDeserializationBenchmark.test2_default_LocalDateTime:gc.alloc.rate.norm    avgt   10  1294166.117 ± 670.974 B/op
+LocalDateDeserializationBenchmark.test2_default_LocalDateTime:gc.count              avgt   10       54.000 counts
+LocalDateDeserializationBenchmark.test2_default_LocalDateTime:gc.time               avgt   10      260.000 ms
 ```
 
-### Summary
+### custom
 
-| Variant       | Time (ms/op) | Allocations (B/op) | Speed vs Default | Allocations vs Default |
-|---------------|--------------|--------------------|------------------|-------------------------|
-| default       | 0.508        | 1,293,266          | 1.0×             | 1.0×                    |
-| custom        | 0.244        |   369,652          | ~2.1× faster     | ~3.5× less              |
-| zeroAlloc     | 0.161        |    90,803          | ~3.1× faster     | ~14.2× less             |
+```
+LocalDateDeserializationBenchmark.test2_custom_LocalDateTime                        avgt   10        1.699 ± 1.138   ms/op
+LocalDateDeserializationBenchmark.test2_custom_LocalDateTime:gc.alloc.rate          avgt   10      227.850 ± 80.600  MB/sec
+LocalDateDeserializationBenchmark.test2_custom_LocalDateTime:gc.alloc.rate.norm     avgt   10      370049.595 ± 125.909 B/op
+LocalDateDeserializationBenchmark.test2_custom_LocalDateTime:gc.count               avgt   10       24.000 counts
+LocalDateDeserializationBenchmark.test2_custom_LocalDateTime:gc.time                avgt   10      333.000 ms
+```
+
+### zeroAlloc
+
+```
+LocalDateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime                     avgt   10        0.623 ± 0.721   ms/op
+LocalDateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.alloc.rate       avgt   10      214.594 ± 207.325 MB/sec
+LocalDateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.alloc.rate.norm  avgt   10       90935.626 ± 120.387 B/op
+LocalDateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.count            avgt   10       29.000 counts
+LocalDateDeserializationBenchmark.test2_zeroAlloc_LocalDateTime:gc.time             avgt   10      101.000 ms
+```
+
+---
+
+## Run the Benchmark
+
+```bash
+./gradlew jmh
+```
